@@ -1,0 +1,38 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+Scripts/
+Lib/
+Include/
+pyvenv.cfg
+
+# Django
+*.log
+db.sqlite3-journal
+
+# Static files (if collected)
+/staticfiles/
+/static_collected/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.bak
+

@@ -1,0 +1,118 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Product List - Product Catalog{% endblock %}
+
+{% block content %}
+<!--Search and filter form -->
+<div class="filter-section">
+    <h2>Search & Filter Products</h2>
+    <form method="get" action="{% url 'product_list' %}" class="filter-form">
+        <!-- Search by name or Description-->
+        <div class="form-group">
+            <label for="search">Search by name or description:</label>
+            <input 
+                type="text" 
+                id="search" 
+                name="search" 
+                placeholder="Enter keywords..." 
+                value="{{ search_query }}"
+            >
+        </div>
+        <!--Filter by category -->
+        <div class="form-group">
+            <label for="category">Filter by category:</label>
+            <select id="category" name="category">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" 
+                        {% if category.id|stringformat:"s" == selected_category %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Filter by Tags -->
+        <div class="form-group">
+            <label>Filter by tags (select multiple):</label>
+            <div class="tag-list">
+                {% for tag in tags %}
+                    <div class="tag-item">
+                        <input 
+                            type="checkbox" 
+                            id="tag-{{ tag.id }}" 
+                            name="tags" 
+                            value="{{ tag.id }}"
+                            {% if tag.id|stringformat:"s" in selected_tags %}checked{% endif %}
+                        >
+                        <label for="tag-{{ tag.id }}">{{ tag.name }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Apply Filters and Clear Filters buttons -->
+        <div class="form-actions">
+            <button type="submit">Apply Filters</button>
+            <a href="{% url 'product_list' %}" class="button btn-secondary">Clear All Filters</a>
+        </div>
+    </form>
+</div>
+
+<!-- Show Filters in use-->
+{% if active_filters %}
+<div class="active-filters">
+    <h3>Active Filters:</h3>
+    {% if active_filters.search %}
+        <span class="filter-badge">Search: "{{ active_filters.search }}"</span>
+    {% endif %}
+    {% if active_filters.category %}
+        <span class="filter-badge">Category: {{ active_filters.category }}</span>
+    {% endif %}
+    {% if active_filters.tags %}
+        {% for tag_name in active_filters.tags %}
+            <span class="filter-badge">Tag: {{ tag_name }}</span>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endif %}
+
+<!--Products Results-->
+<div class="products-header">
+    <h2>Products</h2>
+    <span class="product-count">Showing {{ product_count }} product{{ product_count|pluralize }}</span>
+</div>
+
+{% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <div class="product-category">{{ product.category.name }}</div>
+                <h3 class="product-name">{{ product.name }}</h3>
+                <div class="product-price">${{ product.price|floatformat:2 }}</div>
+                <p class="product-description">{{ product.description|truncatewords:30 }}</p>
+                
+                {% if product.tags.all %}
+                    <div class="product-tags">
+                        {% for tag in product.tags.all %}
+                            <span class="tag-badge">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="product-meta">
+                    Added: {{ product.created_at|date:"M d, Y" }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="no-results">
+        <h3>No products found</h3>
+        <p>Try adjusting your search criteria</p>
+        <a href="{% url 'product_list' %}" class="button" style="margin-top: 15px;">View All Products</a>
+    </div>
+{% endif %}
+
+{% endblock %}
+
